@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<faces-config version="2.0" 
+		xmlns="http://java.sun.com/xml/ns/javaee" 
+		xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd">
+
+    <managed-bean>
+    	<managed-bean-name>userController</managed-bean-name>
+    	<managed-bean-class>com.josivansilva.presentation.UserController</managed-bean-class>
+    	<managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+    	<managed-bean-name>sectionController</managed-bean-name>
+    	<managed-bean-class>com.josivansilva.presentation.SectionController</managed-bean-class>
+    	<managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+    	<managed-bean-name>topicController</managed-bean-name>
+    	<managed-bean-class>com.josivansilva.presentation.TopicController</managed-bean-class>
+    	<managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+    	<managed-bean-name>menuController</managed-bean-name>
+    	<managed-bean-class>com.josivansilva.presentation.MenuController</managed-bean-class>
+    	<managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+    	<managed-bean-name>pageController</managed-bean-name>
+    	<managed-bean-class>com.josivansilva.presentation.PageController</managed-bean-class>
+    	<managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+    	<managed-bean-name>articleController</managed-bean-name>
+    	<managed-bean-class>com.josivansilva.presentation.ArticleController</managed-bean-class>
+    	<managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+    	<managed-bean-name>headerController</managed-bean-name>
+    	<managed-bean-class>com.josivansilva.presentation.HeaderController</managed-bean-class>
+    	<managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+    	<managed-bean-name>contactController</managed-bean-name>
+    	<managed-bean-class>com.josivansilva.presentation.ContactController</managed-bean-class>
+    	<managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
+</faces-config>

@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:f="http://java.sun.com/jsf/core"
+	  xmlns:ui="http://java.sun.com/jsf/facelets">
+	  	    
+	<ui:composition template="/layoutAdmin/template.xhtml">
+		<ui:define name="body">
+			
+			<script type="text/javascript">
+				
+				$(document).ready(function() {
+				   				   
+				   $('#form-add-edit').submit(function() {
+					   return isValidForm ();
+				   });				   
+				   
+				   checkQueryStringMsg ();
+				   
+			   });
+			
+				/**
+			    * Checks if the form is fulfilled or not.
+			    * 
+			    * @returns {boolean} boolean containing the operation result.
+			    */
+			   function isValidForm () {
+					var isValid  = true;
+					var name    = document.getElementById ("form-add-edit:name").value;
+					var idMenu  = document.getElementById ("form-add-edit:idMenu").value;
+					var content = document.getElementById ("form-add-edit:form-text-editor:content").value;
+					var url     = document.getElementById ("form-add-edit:url").value;
+					
+					if (isEmpty (name) 
+							|| isEmpty (idMenu)
+							|| isEmpty (content)
+							|| isEmpty (url)) {
+						isValid = false;
+						showMessageByContainer (2,"message-container","message-paragraph", "Please fill in all fields correctly.");
+					}
+					return isValid;
+			   }			      		  
+			
+			</script>
+			
+			<div id="container-content">
+				<!-- menuLeft -->
+				<ui:include src="/layoutAdmin/menuLeft.xhtml" />
+				<div id="container-col-list">
+					<div id="container-form-title">add / edit page</div>
+						<div id="conteiner-form">
+					      <h:form id="form-add-edit" method="post">
+					      	  <h:inputHidden id="idPage" value="#{pageController.idPageForm}" />
+						      <div>
+						      	<div id="message-container" class="message-container" style="display: none;">
+									<p id="message-paragraph" class="error-message"></p>
+								</div>
+								<div class="field-container">
+									<h:inputText id="name" value="#{pageController.nameForm}" />
+								</div>
+								<div class="field-container">
+									<h:selectOneMenu id="idMenu" value="#{pageController.idMenuForm}">
+	   									<f:selectItem itemValue="" itemLabel="menu" />
+	   									<f:selectItems value="#{pageController.menuMap}" />
+	   								</h:selectOneMenu>
+								</div>
+								<div>
+									<h:form id="form-text-editor">
+        								<h:inputTextarea id="content" value="#{pageController.contentForm}" />
+    								</h:form>
+								</div>
+								<div class="field-container" style="margin-top: 15px">
+									<h:inputText id="url" value="#{pageController.urlForm}" />
+								</div>
+								<div class="button-container">
+									<h:commandButton id="button-save" value="save" type="submit" action="#{pageController.save}" />
+								</div>
+						      </div>
+						  </h:form>
+					    </div> 										
+				</div>
+			</div>
+			
+		</ui:define>
+	</ui:composition>
+	
+</html>

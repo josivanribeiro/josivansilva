@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:f="http://java.sun.com/jsf/core"
+	  xmlns:ui="http://java.sun.com/jsf/facelets">
+    <ui:composition>
+		<div id="container-col-menu">
+			<div id="menu-wrapper">
+			    <ul>
+			        <li><a href="userList.page">users</a></li>
+			        <li><a href="menuList.page">menus</a></li>
+			        <li><a href="pageList.page">pages</a></li>
+			        <li><a href="topicList.page">topics</a></li>
+			        <li><a href="sectionList.page">sections</a></li>
+			        <li><a href="articleList.page">articles</a></li>
+			    </ul>
+			</div>
+			<div id="container-logged-user">
+				<h:graphicImage library="images" name="bg_icon_user.png" /> <h:outputText value="#{userController.username}" />
+			</div>
+		</div>
+	</ui:composition>
+</html>
+
+
+
+
+
+				

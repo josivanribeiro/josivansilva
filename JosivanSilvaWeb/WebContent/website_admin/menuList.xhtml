@@ -1,0 +1,309 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:f="http://java.sun.com/jsf/core"
+	  xmlns:ui="http://java.sun.com/jsf/facelets">
+	  	    
+	<ui:composition template="/layoutAdmin/template.xhtml">
+		<ui:define name="body">
+			
+			<script type="text/javascript">
+				
+				$(document).ready(function() {
+				   				   
+				   $("input[name*=\"button-add\"]").click(function(event) {
+					   $(".open").click();
+					   resetForm ();
+				   });			   				   
+				   
+				   $("input[name*=\"button-save\"]").click(function(event) {
+					   return isValidForm ();
+				   });
+				   
+				   $("input[name*=\"button-edit\"]").click(function(event) {
+					   $(".open").click();
+					   var id = this.id;
+					   var rowIndex = getRowIndexFromStr (id);
+					   copyValues (rowIndex);
+				   });
+				   
+				   $("input[name*=\"button-remove\"]").click(function(event) {
+					   // redirects to the list page (without parameters) after 1 second
+					   setTimeout(function(){redirectTo ("menuList.page?status=removeSuccess")}, 1000);
+				   });
+				   
+				   checkQueryStringMsg ();
+				   
+			   });
+			
+				/**
+			    * Checks if the form is fulfilled or not.
+			    * 
+			    * @returns {boolean} boolean containing the operation result.
+			    */
+			   function isValidForm () {
+			    	var isValid      = true;
+					var name         = document.getElementById ("form-search:form-add-edit:name").value;
+					if (isEmpty (name)) {
+						isValid = false;
+						showMessageByContainer (2,"message-container-2","message-paragraph-2", "Please fill in all fields correctly.");
+					}
+					return isValid;
+			   }
+			    
+			   /**
+			    * Copies values from the edit form to the add-edit-form.
+			    */
+			   function copyValues (rowIndex) {
+				   var FORM_FROM_PREFIX    = "form-search:resultTable:";
+				   var SUBFORM_FROM_PREFIX = ":form-edit:"
+				   var FORM_TO_PREFIX      = "form-search:form-add-edit:";
+				   
+				   var fromIdMenu       = document.getElementById (FORM_FROM_PREFIX + rowIndex + SUBFORM_FROM_PREFIX + "idMenuHidden").value;
+				   var fromIdMenuFather = document.getElementById (FORM_FROM_PREFIX + rowIndex + SUBFORM_FROM_PREFIX + "idMenuFatherHidden").value;
+				   var fromName         = document.getElementById (FORM_FROM_PREFIX + rowIndex + SUBFORM_FROM_PREFIX + "nameHidden").value;
+				      				    
+				   $("input[name=\"" + FORM_TO_PREFIX + "idMenu\"]").val(fromIdMenu);
+				   $("input[name=\"" + FORM_TO_PREFIX + "idMenuFather\"]").val(fromIdMenuFather);
+				   $("input[name=\"" + FORM_TO_PREFIX + "name\"]").val(fromName);
+				   
+			   }			   
+			   
+			   /**
+			    * Resets the user form.
+			    */
+			   function resetForm () {
+				   var FORM_PREFIX   = "form-search:form-add-edit:";
+				   $("input[name=\"" + FORM_PREFIX + "idMenu\"]").val("");
+				   $("input[name=\"" + FORM_PREFIX + "name\"]").val("name");
+				   $("input[name=\"" + FORM_PREFIX + "idMenuFather\"]").val("");				   
+			   }
+			   
+			   /**
+			     * Checks if exists query string messages, if so, a message will be printed.
+			    */
+			   function checkQueryStringMsg () {
+				   var status = null;
+				   status     = getUrlVars()["status"];
+				   if (!isEmpty (status)) {			   
+					   if (status == "saveSuccess") {
+						   showMessage (1, "Menu successfully saved.");						   
+					   } else if (status == "removeSuccess") {
+						   showMessage (1, "Menu(s) successfully removed.");
+					   }
+					   // redirects to the list page (without parameters) after 5 seconds
+					   setTimeout(function(){redirectTo ("menuList.page")}, 5000);
+				   }
+			   }			  
+			
+			</script>
+			
+			<div id="container-content">
+				<!-- menuLeft -->
+				<ui:include src="/layoutAdmin/menuLeft.xhtml" />
+				<div id="container-col-list">
+					<div id="container-form-title">menus</div>
+					<h:form id="form-search" method="post">
+						<div id="container-search">			
+								<!-- message container -->
+								<div id="message-container" class="message-container" style="display: none;">
+									<p id="message-paragraph" class="error-message"></p>
+								</div>
+								<div class="field-container-search-filter-left">
+									<h:inputText id="name" value="#{menuController.nameFilter}" style="width: 403px;" />
+								</div>
+								<div class="field-container-search-filter-right">
+									<div style="float: left; margin-right: 10px;">
+										<h:selectOneMenu id="idMenuFather" value="#{menuController.idMenuFatherFilter}" style="width: 315px;">
+		   									<f:selectItem itemValue="" itemLabel="menu father" />
+		   									<f:selectItems value="#{menuController.menuFatherMap}" />
+		   								</h:selectOneMenu>
+									</div>								
+	    							<div id="container-search-filter-button-right">    							
+	    								<h:commandButton 
+	    									value="submit" 
+	    									type="submit" 
+	    									image="/josivansilvaweb/javax.faces.resource/bg_icon_search.png.page?ln=images" 
+	    									onmouseover="javascript:changeImageSrc(this, 'bg_icon_search_over.png');" 
+	    									onmouseout="javascript:changeImageSrc(this, 'bg_icon_search.png');" 
+	    									action="#{menuController.searchByFilter}" >
+	    										<f:ajax execute="name" render="resultTable" />
+	    										<f:ajax execute="idMenuFather" render="resultTable" />	    										
+	    								</h:commandButton>	    							
+									</div>								
+								</div>							
+						</div>
+					<div id="container-button-add">						
+						<h:commandButton
+			    	    		id="button-add"
+			    	    		image="/josivansilvaweb/javax.faces.resource/bg_add_icon.png.page?ln=images"
+			    	    		onmouseover="javascript:changeImageSrc (this, 'bg_add_icon_over.png');"
+			    	    		onmouseout="javascript:changeImageSrc(this, 'bg_add_icon.png');" title="add user">
+			    	    		<f:ajax execute="name" render="resultTable" />
+			    	    		<f:ajax execute="idMenuFather" render="resultTable" />			    	    		
+			    	    </h:commandButton>								
+						<!-- popbox -->
+						<div class='popbox'>						    
+						    <a class='open' href='#' title="add menu"></a>
+						    <div class='collapse'>
+						      <h:form id="form-add-edit" method="post">
+						      	  <h:inputHidden id="idMenu" value="#{menuController.idMenuForm}" />
+							      <div class='box'>
+							      	<div class="box-title">
+							      		<span>add / edit menu</span>
+							      	</div>
+							      	<div id="message-container-2" class="message-container" style="display: none;">
+										<p id="message-paragraph-2" class="error-message"></p>
+									</div>
+									<div class="field-container">
+										<h:inputText id="name" value="#{menuController.nameForm}" />
+									</div>
+									<div class="field-container">
+										<h:selectOneMenu id="idMenuFather" value="#{menuController.idMenuFatherForm}">
+		   									<f:selectItem itemValue="" itemLabel="menu father" />
+		   									<f:selectItems value="#{menuController.menuFatherMap}" />
+		   								</h:selectOneMenu>
+									</div>
+									<div class="button-container">
+										<a href="#" class="close">
+											<img src="/josivansilvaweb/javax.faces.resource/button_close.png.page?ln=images" 
+												 onmouseover="javascript:changeImageSrc(this, 'button_close_over.png');" 
+												 onmouseout="javascript:changeImageSrc(this, 'button_close.png');" border="0" />
+										</a>
+										<h:commandButton 
+												id="button-save"
+												value="save" 
+												type="submit" 
+												action="#{menuController.save}" />
+									</div>
+							      </div>
+							  </h:form>
+						    </div>
+  						</div>
+  						<!-- popbox -->							
+					</div>
+					<div id="container-search-result">						
+						<h:dataTable id="resultTable" value="#{menuController.menuList}" var="menu">
+						    <h:column>
+						        <f:facet name="header">
+						            <input type="checkbox" id="chkSelectAll" onclick="javascript:changeCheckboxesStatus('idMenu');" />
+						        </f:facet>
+						        <div align="center">
+						        	<input type="checkbox" id="idMenu" name="idMenu" value="#{menu.ID_MENU}" onclick="javascript:setSelectedCheckboxes('idMenu');"  />
+						        </div>
+						    </h:column>
+						    <h:column>
+						        <f:facet name="header">
+						            <h:outputText value="id" />
+						        </f:facet>
+						        <div align="center">
+						        	<h:outputText value="#{menu.ID_MENU}" />							        	
+						        </div>
+						    </h:column>
+						    <h:column>
+						        <f:facet name="header">
+						            <h:outputText value="name" />
+						        </f:facet>
+						        <div style="width: 300px;">
+						        	<div style="float: left;">
+						        		<h:outputText value="#{menu.NM_MENU}" />
+						        	</div>
+						        	<div style="float: right;">
+							        	<h:form id="form-edit">
+							        		<h:inputHidden id="idMenuForm" value="#{menuController.idMenuForm}" />
+							        		<h:inputHidden id="idMenuFatherForm" value="#{menuController.idMenuFatherForm}" />
+							        		<h:inputHidden id="nameForm"   value="#{menuController.nameForm}" />
+							        		<h:commandButton
+								    	    	id="button-edit" 
+								    	    	image="/josivansilvaweb/javax.faces.resource/bg_edit_icon.png.page?ln=images"
+								    	    	onmouseover="javascript:changeImageSrc (this, 'bg_edit_icon_over.png');"
+								    	    	onmouseout="javascript:changeImageSrc(this, 'bg_edit_icon.png');"
+								    	    	actionListener="#{menuController.editListener}" title="edit user">
+								    	   		<f:ajax execute="idMenuForm"       render="idMenuHidden" />
+								    	   		<f:ajax execute="idMenuFatherForm" render="idMenuFatherHidden" />
+								    	   		<f:ajax execute="nameForm"         render="nameHidden" />
+								    	   		<f:param name="idMenu"             value="#{menu.ID_MENU}" />
+								    	    </h:commandButton>	    
+								    	    <h:inputHidden id="idMenuHidden"       value="#{menuController.idMenuForm}" />
+								    	    <h:inputHidden id="idMenuFatherHidden" value="#{menuController.idMenuFatherForm}" />
+								    	    <h:inputHidden id="nameHidden"         value="#{menuController.nameForm}" />							    	    
+							    	    </h:form>
+						        	</div>
+						        </div>
+						    </h:column>						    
+						</h:dataTable>
+					</div>
+					
+					<div id="container-navigation-table">
+						<div id="container-button-first">
+							<h:inputHidden id="first" value="#{menuController.pagination.first}" />
+							<h:commandButton 
+								image="/josivansilvaweb/javax.faces.resource/bg_button_first.png.page?ln=images" 
+								onmouseover="javascript:changeImageSrc(this, 'bg_button_first_over.png');"
+								onmouseout="javascript:changeImageSrc(this, 'bg_button_first.png');"
+								actionListener="#{menuController.searchByFilterListener}" title="first">
+								<f:ajax execute="first" render="resultTable" />
+								<f:attribute name="toPage" value="first" />
+							</h:commandButton>							
+						</div>
+						<div id="container-button-previous">
+							<h:inputHidden id="previous" value="#{menuController.pagination.previous}" />
+							<h:commandButton
+								image="/josivansilvaweb/javax.faces.resource/bg_button_previous.png.page?ln=images" 
+								onmouseover="javascript:changeImageSrc(this, 'bg_button_previous_over.png');" 
+								onmouseout="javascript:changeImageSrc(this, 'bg_button_previous.png');" 
+								actionListener="#{menuController.searchByFilterListener}" title="previous">
+								<f:ajax execute="previous" render="resultTable" />
+								<f:attribute name="toPage" value="previous" />
+							</h:commandButton>							
+						</div>
+						<div id="container-button-next">
+							<h:inputHidden id="next" value="#{menuController.pagination.next}" />
+							<h:commandButton 
+								image="/josivansilvaweb/javax.faces.resource/bg_button_next.png.page?ln=images" 
+								onmouseover="javascript:changeImageSrc(this, 'bg_button_next_over.png');" 
+								onmouseout="javascript:changeImageSrc(this, 'bg_button_next.png');" 
+								actionListener="#{menuController.searchByFilterListener}" title="next">
+								<f:ajax execute="next" render="resultTable" />
+								<f:attribute name="toPage" value="next" />
+							</h:commandButton>							
+						</div>
+						<div id="container-button-last">
+							<h:inputHidden id="last" value="#{menuController.pagination.last}" />
+							<h:commandButton 
+								image="/josivansilvaweb/javax.faces.resource/bg_button_last.png.page?ln=images" 
+								onmouseover="javascript:changeImageSrc(this, 'bg_button_last_over.png');" 
+								onmouseout="javascript:changeImageSrc(this, 'bg_button_last.png');" 
+								actionListener="#{menuController.searchByFilterListener}" title="last">
+								<f:ajax execute="last" render="resultTable" />
+								<f:attribute name="toPage" value="last" />
+							</h:commandButton>							
+						</div>					
+					</div>
+					
+					<div id="container-button-remove">
+						<h:form id="form-remove">
+							<h:inputHidden id="removeItems" value="#{menuController.removeItems}" />
+							<h:commandButton 
+								id="button-remove"
+								value="submit" 
+								type="submit"
+								image="/josivansilvaweb/javax.faces.resource/bg_icon_remove.png.page?ln=images" 
+								onmouseover="javascript:changeImageSrc(this, 'bg_icon_remove_over.png');" 
+								onmouseout="javascript:changeImageSrc(this, 'bg_icon_remove.png');" 
+								title="remove users">
+								<f:ajax execute="removeItems" render="output" />
+							</h:commandButton>
+							<h:inputHidden id="output" value="#{menuController.remove}" />
+						</h:form>							
+					</div>
+					
+				</h:form>		
+										
+			</div>			
+		</div>				
+			
+		</ui:define>
+	</ui:composition>
+	
+</html>

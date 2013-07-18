@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:f="http://java.sun.com/jsf/core"
+	  xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:composition>
+		<div id="header-website">
+			<!-- logo -->
+			<h1 id="logo-website">
+				<a href="#" title="josivan silva">
+					<h:graphicImage library="images" name="logo_josivan_silva.png" width="171px" height="35px" />
+				</a>
+			</h1>
+			<div id="container-top-search">
+				<h:form id="form-top-search">
+					<div>
+						<div style="float: left;">
+							<h:inputText id="name" value="#{pageController.nameForm}" />
+						</div>
+						<div style="float: left; margin-top: 4px;">
+							<h:commandButton 
+								value="submit"
+								type="submit"
+								image="/josivansilvaweb/javax.faces.resource/bg_icon_search.png.page?ln=images" 
+								onmouseover="javascript:changeImageSrc(this, 'bg_icon_search_over.png');" 
+								onmouseout="javascript:changeImageSrc(this, 'bg_icon_search.png');" 
+								action="#{menuController.searchByFilter}" >
+							</h:commandButton>
+						</div>
+					</div>
+					
+				</h:form>
+			</div>
+		</div>
+	</ui:composition>
+</html>

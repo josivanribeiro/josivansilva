@@ -1,0 +1,341 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:f="http://java.sun.com/jsf/core"
+	  xmlns:ui="http://java.sun.com/jsf/facelets">
+	  	    
+	<ui:composition template="/layoutAdmin/template.xhtml">
+		<ui:define name="body">
+			
+			<script type="text/javascript">
+				
+				$(document).ready(function() {
+				   				   
+				   $("input[name*=\"button-add\"]").click(function(event) {
+					   $(".open").click();
+						resetUserForm ();
+				   });			   				   
+				   
+				   $("input[name*=\"button-save\"]").click(function(event) {
+					   return isValidForm ();
+				   });
+				   
+				   $("input[name*=\"button-edit\"]").click(function(event) {
+					   $(".open").click();
+					   var id = this.id;
+					   var rowIndex = getRowIndexFromStr (id);
+					   copyValues (rowIndex);
+				   });
+				   
+				   $("input[name*=\"button-remove\"]").click(function(event) {
+					   // redirects to the list page (without parameters) after 1 second
+					   setTimeout(function(){redirectTo ("userList.page?status=removeSuccess")}, 1000);
+				   });
+				   
+				   checkQueryStringMsg ();
+				   
+			   });
+			
+				/**
+			    * Checks if the form is fulfilled or not.
+			    * 
+			    * @returns {boolean} boolean containing the operation result.
+			    */
+			   function isValidForm () {
+					var isValid  = true;
+					var username = document.getElementById ("form-search:form-add-edit-user:username").value;
+					var pwd 	 = document.getElementById ("form-search:form-add-edit-user:pwd").value;
+					var email    = document.getElementById ("form-search:form-add-edit-user:email").value;
+					if (isEmpty (username) 
+							|| isEmpty (pwd)
+							|| isEmpty (email)
+							|| !isValidEmail (email)) {
+						isValid = false;
+						showMessageByContainer (2,"message-container-2","message-paragraph-2", "Please fill in all fields correctly.");
+					}
+					return isValid;
+			   }
+			    
+			   /**
+			    * Copies values from the user edit form to the user add-edit-form.
+			    */
+			   function copyValues (rowIndex) {
+				   var FORM_FROM_PREFIX    = "form-search:resultTable:";
+				   var SUBFORM_FROM_PREFIX = ":form-edit-user:"
+				   var FORM_TO_PREFIX      = "form-search:form-add-edit-user:";
+				   
+				   var fromIdUser    = document.getElementById (FORM_FROM_PREFIX + rowIndex + SUBFORM_FROM_PREFIX + "idUserHidden").value;
+				   var fromUsername  = document.getElementById (FORM_FROM_PREFIX + rowIndex + SUBFORM_FROM_PREFIX + "usernameHidden").value;
+				   var fromEmail     = document.getElementById (FORM_FROM_PREFIX + rowIndex + SUBFORM_FROM_PREFIX + "emailHidden").value;
+				   var fromAdminRole = document.getElementById (FORM_FROM_PREFIX + rowIndex + SUBFORM_FROM_PREFIX + "adminRoleHidden").value;
+				   
+				   $("input[name=\"" + FORM_TO_PREFIX + "idUser\"]").val(fromIdUser);
+				   $("input[name=\"" + FORM_TO_PREFIX + "username\"]").val(fromUsername);
+				   $("input[name=\"" + FORM_TO_PREFIX + "email\"]").val(fromEmail);
+				   
+				   if (fromAdminRole == "true"){
+					   document.getElementById (FORM_TO_PREFIX + "roleAdmin").checked = true;
+				   } else {
+					   document.getElementById (FORM_TO_PREFIX + "roleAdmin").checked = false;
+				   }
+
+			   }			   
+			   
+			   /**
+			    * Resets the user form.
+			    */
+			   function resetUserForm () {
+				   var FORM_PREFIX   = "form-search:form-add-edit-user:";
+				   $("input[name=\"" + FORM_PREFIX + "idUser\"]").val("");
+				   $("input[name=\"" + FORM_PREFIX + "username\"]").val("username");
+				   $("input[name=\"" + FORM_PREFIX + "email\"]").val("email");
+				   document.getElementById (FORM_PREFIX + "roleAdmin").checked = true;
+			   }
+			   
+			   /**
+			     * Checks if exists query string messages, if so, a message will be printed.
+			    */
+			   function checkQueryStringMsg () {
+				   var status = null;
+				   status     = getUrlVars()["status"];
+				   if (!isEmpty (status)) {			   
+					   if (status == "saveSuccess") {
+						   showMessage (1, "User successfully saved.");						   
+					   } else if (status == "removeSuccess") {
+						   showMessage (1, "User(s) successfully removed.");
+					   }
+					   // redirects to the list page (without parameters) after 5 seconds
+					   setTimeout(function(){redirectTo ("userList.page")}, 5000);
+				   }
+			   }			  
+			
+			</script>
+			
+			<div id="container-content">
+				<!-- menuLeft -->
+				<ui:include src="/layoutAdmin/menuLeft.xhtml" />
+				<div id="container-col-list">
+					<div id="container-form-title">users</div>
+					<h:form id="form-search" method="post">
+						<div id="container-search">						
+								<!-- message container -->
+								<div id="message-container" class="message-container" style="display: none;">
+									<p id="message-paragraph" class="error-message"></p>
+								</div>
+								<div class="field-container-search-filter-left">
+									<h:inputText id="username" value="#{userController.usernameFilter}" style="width: 403px;" />
+								</div>
+								<div class="field-container-search-filter-right">
+									<div style="float: left; margin-right: 10px;">
+										<h:selectBooleanCheckbox id="roleAdmin" value="#{userController.adminRoleFilter}" />
+	    								<h:outputLabel value="administrator" />
+									</div>								
+	    							<div id="container-search-filter-button-right">    							
+	    								<h:commandButton 
+	    									value="submit" 
+	    									type="submit" 
+	    									image="/josivansilvaweb/javax.faces.resource/bg_icon_search.png.page?ln=images" 
+	    									onmouseover="javascript:changeImageSrc(this, 'bg_icon_search_over.png');" 
+	    									onmouseout="javascript:changeImageSrc(this, 'bg_icon_search.png');" 
+	    									action="#{userController.searchByFilter}" >
+	    										<f:ajax execute="username" render="resultTable" />
+	    										<f:ajax execute="roleAdmin" render="resultTable" />
+	    								</h:commandButton>	    							
+									</div>								
+								</div>							
+						</div>
+					<div id="container-button-add">						
+						<h:commandButton
+			    	    		id="button-add"
+			    	    		image="/josivansilvaweb/javax.faces.resource/bg_add_icon.png.page?ln=images"
+			    	    		onmouseover="javascript:changeImageSrc (this, 'bg_add_icon_over.png');"
+			    	    		onmouseout="javascript:changeImageSrc(this, 'bg_add_icon.png');" title="add user">
+			    	    		<f:ajax execute="username" render="resultTable" />
+			    	    		<f:ajax execute="roleAdmin" render="resultTable" />
+			    	    </h:commandButton>			    	    												
+						<!-- popbox -->
+						<div class='popbox'>						    
+						    <a class='open' href='#' title="add user"></a>
+						    <div class='collapse'>
+						      <h:form id="form-add-edit-user" method="post">
+						      	  <h:inputHidden id="idUser" value="#{userController.idUserForm}" />
+							      <div class='box'>
+							      	<div class="box-title">
+							      		<span>add / edit user</span>
+							      	</div>
+							      	<div id="message-container-2" class="message-container" style="display: none;">
+										<p id="message-paragraph-2" class="error-message"></p>
+									</div>
+									<div class="field-container">
+										<h:inputText id="username" value="#{userController.usernameForm}" />
+									</div>
+									<div class="field-container">
+										<h:inputSecret id="pwd" value="#{userController.pwdForm}" />
+									</div>
+									<div class="field-container">
+										<h:inputText id="email" value="#{userController.emailForm}" />
+									</div>
+									<div class="field-container">
+										<div style="float: left;">
+											<h:selectBooleanCheckbox id="roleAdmin" value="#{userController.adminRoleForm}" />
+											<h:outputText value="administrator" style="margin-left:5px;" />
+										</div>
+									</div>
+									<div class="button-container">
+										<a href="#" class="close">
+											<img src="/josivansilvaweb/javax.faces.resource/button_close.png.page?ln=images" onmouseover="javascript:changeImageSrc(this, 'button_close_over.png');" onmouseout="javascript:changeImageSrc(this, 'button_close.png');" border="0" />
+										</a>
+										<h:commandButton 
+												id="button-save"
+												value="save" 
+												type="submit" 
+												action="#{userController.save}" />
+									</div>
+							      </div>
+							  </h:form>
+						    </div>
+  						</div>
+  						<!-- popbox -->							
+					</div>
+					<div id="container-search-result">						
+						<h:dataTable id="resultTable" value="#{userController.userList}" var="user">
+						    <h:column>
+						        <f:facet name="header">
+						            <input type="checkbox" id="chkSelectAll" onclick="javascript:changeCheckboxesStatus('idUser');" />
+						        </f:facet>
+						        <div align="center">
+						        	<input type="checkbox" id="idUser" name="idUser" value="#{user.ID_USER}" onclick="javascript:setSelectedCheckboxes('idUser');"  />
+						        </div>
+						    </h:column>
+						    <h:column>
+						        <f:facet name="header">
+						            <h:outputText value="id" />
+						        </f:facet>
+						        <div align="center">
+						        	<h:outputText value="#{user.ID_USER}" />							        	
+						        </div>
+						    </h:column>
+						    <h:column>
+						        <f:facet name="header">
+						            <h:outputText value="username" />
+						        </f:facet>
+						        <div style="float: left;">
+						        	<h:outputText value="#{user.USERNAME}" />
+						        </div>
+						        <div style="float: right;">
+						        	<h:form id="form-edit-user">
+						        		<h:inputHidden id="idUserForm"    value="#{userController.idUserForm}" />
+						        		<h:inputHidden id="usernameForm"  value="#{userController.usernameForm}" />
+						        		<h:inputHidden id="emailForm"     value="#{userController.emailForm}" />
+						        		<h:inputHidden id="adminRoleForm" value="#{userController.adminRoleForm}" />
+							    	    <h:commandButton
+							    	    	id="button-edit" 
+							    	    	image="/josivansilvaweb/javax.faces.resource/bg_edit_icon.png.page?ln=images"
+							    	    	onmouseover="javascript:changeImageSrc (this, 'bg_edit_icon_over.png');"
+							    	    	onmouseout="javascript:changeImageSrc(this, 'bg_edit_icon.png');"
+							    	    	actionListener="#{userController.editListener}" title="edit user">
+							    	   		<f:ajax execute="idUserForm"    render="idUserHidden" />
+							    	   		<f:ajax execute="usernameForm"  render="usernameHidden" />
+							    	   		<f:ajax execute="emailForm"     render="emailHidden" />
+							    	   		<f:ajax execute="adminRoleForm" render="adminRoleHidden" />
+							    	   		<f:param name="idUser"          value="#{user.ID_USER}" />
+							    	    </h:commandButton>	    
+							    	    <h:inputHidden id="idUserHidden"    value="#{userController.idUserForm}" />
+							    	    <h:inputHidden id="usernameHidden"  value="#{userController.usernameForm}" />
+							    	    <h:inputHidden id="emailHidden"     value="#{userController.emailForm}" />
+						        		<h:inputHidden id="adminRoleHidden" value="#{userController.adminRoleForm}" />
+						    	    </h:form>
+						        </div>
+						    </h:column>
+						    <h:column>
+						        <f:facet name="header">
+						            <h:outputText value="email" />
+						        </f:facet>							        
+        							<div align="center">
+        								<h:outputText value="#{user.EMAIL}" />
+        							</div>
+						    </h:column>
+						    <h:column>
+						        <f:facet name="header">
+						            <h:outputText value="administrator" />
+						        </f:facet>							        
+       							<div align="center">
+					        		<h:graphicImage library="images" name="icon_admin.png" onmouseover="javascript:changeImageSrc(this, 'icon_admin_over.png');" onmouseout="javascript:changeImageSrc(this, 'icon_admin.png');" rendered="#{user.ROLE_ADMIN}" />
+					        	</div>      															        
+						    </h:column>
+						</h:dataTable>
+					</div>
+					
+					<div id="container-navigation-table">
+						<div id="container-button-first">
+							<h:inputHidden id="first" value="#{userController.pagination.first}" />
+							<h:commandButton 
+								image="/josivansilvaweb/javax.faces.resource/bg_button_first.png.page?ln=images" 
+								onmouseover="javascript:changeImageSrc(this, 'bg_button_first_over.png');"
+								onmouseout="javascript:changeImageSrc(this, 'bg_button_first.png');"
+								actionListener="#{userController.searchByFilterListener}" title="first">
+								<f:ajax execute="first" render="resultTable" />
+								<f:attribute name="toPage" value="first" />
+							</h:commandButton>							
+						</div>
+						<div id="container-button-previous">
+							<h:inputHidden id="previous" value="#{userController.pagination.previous}" />
+							<h:commandButton
+								image="/josivansilvaweb/javax.faces.resource/bg_button_previous.png.page?ln=images" 
+								onmouseover="javascript:changeImageSrc(this, 'bg_button_previous_over.png');" 
+								onmouseout="javascript:changeImageSrc(this, 'bg_button_previous.png');" 
+								actionListener="#{userController.searchByFilterListener}" title="previous">
+								<f:ajax execute="previous" render="resultTable" />
+								<f:attribute name="toPage" value="previous" />
+							</h:commandButton>							
+						</div>
+						<div id="container-button-next">
+							<h:inputHidden id="next" value="#{userController.pagination.next}" />
+							<h:commandButton 
+								image="/josivansilvaweb/javax.faces.resource/bg_button_next.png.page?ln=images" 
+								onmouseover="javascript:changeImageSrc(this, 'bg_button_next_over.png');" 
+								onmouseout="javascript:changeImageSrc(this, 'bg_button_next.png');" 
+								actionListener="#{userController.searchByFilterListener}" title="next">
+								<f:ajax execute="next" render="resultTable" />
+								<f:attribute name="toPage" value="next" />
+							</h:commandButton>							
+						</div>
+						<div id="container-button-last">
+							<h:inputHidden id="last" value="#{userController.pagination.last}" />
+							<h:commandButton 
+								image="/josivansilvaweb/javax.faces.resource/bg_button_last.png.page?ln=images" 
+								onmouseover="javascript:changeImageSrc(this, 'bg_button_last_over.png');" 
+								onmouseout="javascript:changeImageSrc(this, 'bg_button_last.png');" 
+								actionListener="#{userController.searchByFilterListener}" title="last">
+								<f:ajax execute="last" render="resultTable" />
+								<f:attribute name="toPage" value="last" />
+							</h:commandButton>							
+						</div>					
+					</div>
+					
+					<div id="container-button-remove">
+						<h:form id="form-remove">
+							<h:inputHidden id="removeItems" value="#{userController.removeItems}" />
+							<h:commandButton 
+								id="button-remove"
+								value="submit" 
+								type="submit"
+								image="/josivansilvaweb/javax.faces.resource/bg_icon_remove.png.page?ln=images" 
+								onmouseover="javascript:changeImageSrc(this, 'bg_icon_remove_over.png');" 
+								onmouseout="javascript:changeImageSrc(this, 'bg_icon_remove.png');" 
+								title="remove users">
+								<f:ajax execute="removeItems" render="output" />																	
+							</h:commandButton>
+							<h:inputHidden id="output" value="#{userController.remove}" />							
+						</h:form>							
+					</div>
+					
+				</h:form>		
+										
+			</div>			
+		</div>				
+			
+		</ui:define>
+	</ui:composition>
+	
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-trsansitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:f="http://java.sun.com/jsf/core"
+	  xmlns:ui="http://java.sun.com/jsf/facelets">
+	  	    
+	<ui:composition template="/layout/template.xhtml">
+		<ui:define name="body">
+			
+			<script type="text/javascript">
+				
+				$(document).ready(function() {
+				   
+				   $('#form-contact').submit(function() {
+					   return isValidForm ();
+				   });
+				   
+				   checkQueryStringMsg ();
+				   
+			    });
+				
+				/**
+			     * Checks if exists query string messages, if so, a message will be printed.
+			    */
+			   function checkQueryStringMsg () {
+				   var status = null;
+				   status     = getUrlVars()["status"];
+				   if (!isEmpty (status)) {	   
+					   if (status == "success") {
+						   showMessage (1, "Contact successfully sent.");
+					   }
+					   // redirects to the list page (without parameters) after 5 seconds
+					   setTimeout(function(){redirectTo ("contact.page")}, 5000);
+				   }
+			   }
+			
+				/**
+			    * Checks if the form is fulfilled or not.
+			    * 
+			    * @returns {boolean} boolean containing the operation result.
+			    */
+			   function isValidForm () {
+					var isValid   = true;
+					var firstName = document.getElementById ("form-contact:firstName").value;
+					var lastName  = document.getElementById ("form-contact:lastName").value;
+					var email     = document.getElementById ("form-contact:email").value;
+					var message   = document.getElementById ("form-contact:message").value;
+					
+					if (isEmpty (firstName) 
+							|| isEmpty (lastName)
+							|| isEmpty (email)
+							|| !isValidEmail (email)
+							|| isEmpty (message)) {
+						isValid = false;
+						showMessageByContainer (2,"message-container","message-paragraph", "Please fill in all fields correctly.");
+					}
+					return isValid;
+			   }
+								   	   		  
+			
+			</script>
+			
+			<div id="container-website-content">
+				<div id="container-website-nav-bar">
+					josivan silva > contact
+				</div>
+				<div id="container-form-title" style="margin-left: 15px;">contact</div>
+				<div id="container-form-website">
+			      <h:form id="form-contact" method="post">			      	  
+				      <div>
+				      	<div id="message-container" class="message-container" style="display: none;">
+							<p id="message-paragraph" class="error-message"></p>
+						</div>
+						<div class="field-container">
+							<div>
+								<div style="float: left;">
+									<h:inputText id="firstName" value="#{contactController.firstNameForm}" style="width: 321px;" />
+								</div>
+								<div style="float: left; margin-left: 13px;">
+									<h:inputText id="lastName" value="#{contactController.lastNameForm}" style="width: 321px;" />
+								</div>
+							</div>
+						</div>
+						<div class="field-container">
+							<h:inputText id="email" value="#{contactController.emailForm}" style="width: 660px;" />
+						</div>
+						<div>
+							<h:inputTextarea id="message" value="#{contactController.messageForm}" rows="4" cols="30" />
+						</div>
+						<div class="button-container" style="margin-top: 13px;">
+							<h:commandButton 
+								id="button-send"
+								value="send"
+								type="submit"
+								action="#{contactController.processForm}" />
+						</div>
+				      </div>
+				  </h:form>
+			    </div>				
+			</div>
+			
+		</ui:define>
+	</ui:composition>
+	
+</html>

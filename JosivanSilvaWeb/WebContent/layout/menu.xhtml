@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:f="http://java.sun.com/jsf/core"
+	  xmlns:ui="http://java.sun.com/jsf/facelets">
+	<ui:composition>
+		<div id="container-menu-website">
+			
+			<div id="menu">
+			    <ul id="nav">
+			    	<ui:repeat var="page" value="#{headerController.pageList}" varStatus="status">
+			    		<li><a href="#{page.URL}">#{page.NM_PAGE}</a>
+				    		<ul>
+								<ui:repeat var="subPage" value="#{headerController.pageList}" varStatus="status">
+									<li><a href="#{subPage.URL}">#{subPage.NM_PAGE}</a></li>
+								</ui:repeat>
+							</ul>
+						</li>
+			    	</ui:repeat>
+			    </ul>
+			</div>
+			    
+				<!-- <div id="menu">				
+					<ul id="nav">
+						<li><a href="#">home</a></li>
+						<li><a href="#">about</a></li>
+						
+						<li><a href="#">articles</a>
+							<ul>
+								<li><a href="#">article 1</a></li>
+								<li><a href="#">article 2</a></li>
+								<li><a href="#">article 3</a></li>
+							</ul>
+						</li>
+						<li><a href="#">contact</a></li>							
+					</ul>				
+				</div> -->
+							
+			
+		</div>
+	</ui:composition>
+</html>
